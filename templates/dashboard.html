@@ -41,7 +41,7 @@
         video, canvas {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Ensures no squishing */
+            object-fit: cover; 
         }
     </style>
 </head>
@@ -60,14 +60,27 @@
                 Register Face
             </a>
 
-            <div id="authSection">
+            <div id="authSection" class="flex items-center gap-3">
+                
                 <button id="loginBtn" onclick="googleLogin()" class="px-5 py-2 bg-white text-gray-900 hover:bg-gray-200 rounded-full text-sm font-bold shadow-lg transition flex items-center gap-2">
                     <i class="fab fa-google"></i> Log In
                 </button>
 
-                <div id="userProfile" class="hidden relative group cursor-pointer" onclick="window.location.href='/calendar'">
-                    <img id="userPhoto" src="" class="w-10 h-10 rounded-full border-2 border-indigo-500 shadow-lg hover:scale-110 transition">
+                <div id="loggedInGroup" class="hidden flex items-center gap-3">
+                    
+                    <button onclick="googleLogout()" class="text-gray-400 hover:text-red-400 text-sm font-bold transition" title="Sign Out">
+                        <i class="fas fa-sign-out-alt text-lg"></i>
+                    </button>
+
+                    <div class="relative group cursor-pointer" onclick="window.location.href='/calendar'">
+                        <img id="userPhoto" src="" class="w-10 h-10 rounded-full border-2 border-indigo-500 shadow-lg hover:scale-110 transition">
+                        <div class="absolute right-0 top-12 w-32 bg-gray-800 text-xs text-center p-2 rounded-lg border border-gray-700 opacity-0 group-hover:opacity-100 transition pointer-events-none">
+                            View Calendar
+                        </div>
+                    </div>
+
                 </div>
+
             </div>
         </div>
     </nav>
@@ -147,18 +160,20 @@
         firebase.initializeApp(firebaseConfig);
 
         const loginBtn = document.getElementById('loginBtn');
-        const userProfile = document.getElementById('userProfile');
+        const loggedInGroup = document.getElementById('loggedInGroup');
         const userPhoto = document.getElementById('userPhoto');
 
         // Check Login State
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
+                // User is Signed In
                 loginBtn.classList.add('hidden');
-                userProfile.classList.remove('hidden');
+                loggedInGroup.classList.remove('hidden'); // Show Profile & Logout
                 userPhoto.src = user.photoURL; 
             } else {
+                // User is Signed Out
                 loginBtn.classList.remove('hidden');
-                userProfile.classList.add('hidden');
+                loggedInGroup.classList.add('hidden'); // Hide Profile & Logout
             }
         });
 
@@ -167,6 +182,16 @@
             firebase.auth().signInWithPopup(provider)
                 .then((result) => { console.log("Logged in:", result.user.displayName); })
                 .catch((error) => { alert("Login Error: " + error.message); console.error(error); });
+        }
+
+        // --- NEW: LOGOUT FUNCTION ---
+        function googleLogout() {
+            firebase.auth().signOut().then(() => {
+                alert("You have been signed out.");
+                window.location.href = '/'; // Refresh Page
+            }).catch((error) => {
+                console.error("Sign Out Error", error);
+            });
         }
 
         // --- 2. MEDIAPIPE LOGIC ---
@@ -182,24 +207,19 @@
         selfieSegmentation.setOptions({ modelSelection: 1 });
 
         selfieSegmentation.onResults((results) => {
-            // FIX: Set canvas size dynamically to match video stream (Prevents Squishing)
             canvasElement.width = videoElement.videoWidth;
             canvasElement.height = videoElement.videoHeight;
 
             canvasCtx.save();
             canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-
-            // 1. Draw Segmentation Mask
             canvasCtx.drawImage(results.segmentationMask, 0, 0, canvasElement.width, canvasElement.height);
 
-            // 2. Logic to keep PERSON clear and BACKGROUND blurred
-            canvasCtx.globalCompositeOperation = 'source-in'; // Only draw where mask is (The Person)
-            canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height); // Draw Clear Person
+            canvasCtx.globalCompositeOperation = 'source-in'; 
+            canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height); 
 
-            // 3. Draw Background behind Person
-            canvasCtx.globalCompositeOperation = 'destination-over'; // Draw behind existing pixels
+            canvasCtx.globalCompositeOperation = 'destination-over'; 
             if (blurEnabled) {
-                canvasCtx.filter = 'blur(15px)'; // Blur amount
+                canvasCtx.filter = 'blur(15px)'; 
                 canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
                 canvasCtx.filter = 'none';
             } else {
@@ -211,7 +231,7 @@
 
         const camera = new Camera(videoElement, {
             onFrame: async () => { await selfieSegmentation.send({image: videoElement}); },
-            width: 1280, height: 720 // Request HD resolution
+            width: 1280, height: 720 
         });
         camera.start();
 
@@ -223,7 +243,6 @@
 
         // --- 3. SEND TO PYTHON ---
         setInterval(() => {
-            // Send smaller image for speed (0.5 quality)
             const imageData = canvasElement.toDataURL('image/jpeg', 0.5);
             fetch('/process_frame', {
                 method: 'POST',
@@ -235,7 +254,6 @@
                 userName.innerText = data.name;
                 statusText.innerText = data.status;
 
-                // Update UI Colors based on Status
                 if (data.color === "green") {
                     statusText.className = "text-4xl md:text-5xl font-extrabold text-green-400";
                     userIcon.className = "fas fa-user-check text-3xl text-green-400";
