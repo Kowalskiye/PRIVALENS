@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Register User</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .glass {
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        body {
+            background: radial-gradient(circle at center, #111827 0%, #000000 100%);
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen flex items-center justify-center p-4">
+
+    <div class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 bg-gray-900 rounded-3xl overflow-hidden shadow-2xl border border-gray-700">
+        
+        <div class="p-8 md:p-12 flex flex-col justify-center">
+            <a href="/" class="text-gray-400 hover:text-white text-sm mb-8 block"><i class="fas fa-arrow-left mr-2"></i> Back to Dashboard</a>
+            
+            <h1 class="text-3xl font-bold mb-2">New Registration</h1>
+            <p class="text-gray-400 mb-8">Enter user details and capture a clear photo.</p>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Full Name</label>
+                    <input type="text" id="username" class="w-full bg-gray-800 border border-gray-700 text-white p-3 rounded-lg focus:outline-none focus:border-indigo-500 transition" placeholder="e.g. Sarah Connor">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase tracking-widest mb-1">Employee / Student ID</label>
+                    <input type="number" id="userid" class="w-full bg-gray-800 border border-gray-700 text-white p-3 rounded-lg focus:outline-none focus:border-indigo-500 transition" placeholder="e.g. 1042">
+                </div>
+            </div>
+
+            <button id="snap" class="mt-8 w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl shadow-lg shadow-indigo-900/50 transition transform hover:scale-[1.02]">
+                <i class="fas fa-camera mr-2"></i> Capture & Save
+            </button>
+            <p id="msg" class="text-center mt-4 font-semibold h-6"></p>
+        </div>
+
+        <div class="relative bg-black flex items-center justify-center overflow-hidden">
+            <video id="video" autoplay playsinline class="absolute inset-0 w-full h-full object-cover opacity-80"></video>
+            <canvas id="canvas" class="hidden"></canvas>
+            
+            <div class="absolute inset-0 border-2 border-indigo-500/30 m-8 rounded-2xl pointer-events-none flex flex-col items-center justify-end pb-8">
+                <p class="text-white/70 text-sm bg-black/50 px-3 py-1 rounded-full backdrop-blur-md">Position face here</p>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const snap = document.getElementById('snap');
+        const msg = document.getElementById('msg');
+        
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => { video.srcObject = stream; })
+            .catch(err => alert("Camera Required"));
+
+        snap.addEventListener("click", () => {
+            const name = document.getElementById('username').value;
+            const uid = document.getElementById('userid').value;
+            
+            if(!name || !uid) { 
+                msg.innerText = "⚠️ Fill all fields!"; 
+                msg.className = "text-center mt-4 font-bold text-yellow-400"; 
+                return; 
+            }
+
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageData = canvas.toDataURL('image/jpeg');
+
+            msg.innerText = "Uploading...";
+            msg.className = "text-center mt-4 font-bold text-blue-400";
+            
+            fetch('/save_user', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name, id: uid, image: imageData })
+            })
+            .then(res => res.json())
+            .then(data => {
+                msg.innerText = "✅ Saved Successfully!";
+                msg.className = "text-center mt-4 font-bold text-green-400";
+                setTimeout(() => { window.location.href = '/'; }, 1500);
+            })
+            .catch(err => {
+                msg.innerText = "❌ Error Saving";
+                msg.className = "text-center mt-4 font-bold text-red-400";
+            });
+        });
+    </script>
+</body>
+</html>

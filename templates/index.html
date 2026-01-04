@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Attendance</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; text-align: center; background-color: #f0f2f5; margin: 0; padding: 20px; }
+        h1 { color: #333; }
+        .btn { padding: 12px 24px; font-size: 16px; border: none; border-radius: 8px; cursor: pointer; text-decoration: none; color: white; margin: 10px; display: inline-block; transition: 0.3s; }
+        .btn-blue { background-color: #007bff; }
+        .btn-green { background-color: #28a745; }
+        .btn:hover { opacity: 0.8; transform: translateY(-2px); }
+        .video-box { border: 5px solid white; border-radius: 12px; display: inline-block; box-shadow: 0 10px 25px rgba(0,0,0,0.2); overflow: hidden; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h1>📸 Cloud Smart Attendance</h1>
+    
+    <div>
+        <a href="/register" class="btn btn-blue">➕ Register New User</a>
+        <a href="/calendar" class="btn btn-green">📅 View Cloud Logs</a>
+    </div>
+
+    <div class="video-box">
+        <img src="{{ url_for('video_feed') }}" width="640" height="480">
+    </div>
+
+    <p>Look at the camera and <b>BLINK</b> to mark attendance.</p>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Privalens Cloud AI</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/selfie_segmentation.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
+    <style>
+        /* Custom Animations */
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 4px;
+            background: #00ffcc;
+            box-shadow: 0 0 10px #00ffcc;
+            animation: scan 2s infinite linear;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .glass {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        body {
+            background: radial-gradient(circle at center, #1f2937 0%, #000000 100%);
+        }
+        /* Fix for Canvas Aspect Ratio */
+        video, canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures no squishing */
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen flex flex-col font-sans">
+
+    <nav class="w-full glass fixed top-0 z-50 px-6 py-4 flex justify-between items-center shadow-lg">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center shadow-md shadow-indigo-500/50">
+                <i class="fas fa-eye text-xl"></i>
+            </div>
+            <h1 class="text-2xl font-bold tracking-wider">Privalens<span class="text-indigo-400">Cloud</span></h1>
+        </div>
+        
+        <div class="flex items-center gap-4">
+            <a href="/register" class="px-5 py-2 border border-indigo-500 text-indigo-400 hover:bg-indigo-500 hover:text-white rounded-full text-sm font-bold transition">
+                Register Face
+            </a>
+
+            <div id="authSection">
+                <button id="loginBtn" onclick="googleLogin()" class="px-5 py-2 bg-white text-gray-900 hover:bg-gray-200 rounded-full text-sm font-bold shadow-lg transition flex items-center gap-2">
+                    <i class="fab fa-google"></i> Log In
+                </button>
+
+                <div id="userProfile" class="hidden relative group cursor-pointer" onclick="window.location.href='/calendar'">
+                    <img id="userPhoto" src="" class="w-10 h-10 rounded-full border-2 border-indigo-500 shadow-lg hover:scale-110 transition">
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="flex-grow flex items-center justify-center pt-24 pb-10 px-4">
+        <div class="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+            
+            <div class="relative group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl blur opacity-30 group-hover:opacity-75 transition duration-1000"></div>
+                
+                <div class="relative bg-gray-900 rounded-2xl overflow-hidden border border-gray-700 shadow-2xl">
+                    <div class="relative aspect-video">
+                        <video id="video" class="hidden" playsinline muted></video>
+                        <canvas id="output_canvas"></canvas>
+                        
+                        <div class="scan-line"></div>
+                        
+                        <div class="absolute top-4 right-4 z-20">
+                            <button onclick="toggleBlur()" class="bg-gray-800/80 backdrop-blur text-xs px-3 py-1 rounded-full border border-gray-600 hover:bg-gray-700">
+                                <i class="fas fa-magic text-yellow-400 mr-1"></i> Privacy Blur: <span id="blurStatus" class="font-bold text-green-400">ON</span>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-gray-800 p-4 flex justify-between items-center text-xs text-gray-400">
+                        <span class="flex items-center gap-2"><i class="fas fa-video text-green-400 animate-pulse"></i> Live Feed</span>
+                        <span class="flex items-center gap-2"><i class="fas fa-shield-alt"></i> Encrypted</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                
+                <div class="glass p-8 rounded-3xl shadow-2xl transform transition hover:-translate-y-1">
+                    <p class="text-indigo-400 font-bold tracking-widest text-xs uppercase mb-2">Real-Time Analysis</p>
+                    <h2 id="statusText" class="text-4xl md:text-5xl font-extrabold text-white mb-1">Initializing...</h2>
+                    <p class="text-gray-400 text-sm">Please look directly at the camera.</p>
+                </div>
+
+                <div class="glass p-6 rounded-3xl flex items-center gap-6 shadow-xl">
+                    <div class="w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center border-4 border-gray-600 shadow-inner">
+                        <i id="userIcon" class="fas fa-user text-3xl text-gray-400"></i>
+                    </div>
+                    <div>
+                        <p class="text-gray-400 text-xs uppercase font-bold">Identified User</p>
+                        <h3 id="userName" class="text-2xl font-bold text-white">Searching...</h3>
+                        <p class="text-xs text-gray-500 mt-1">ID: <span id="userId">--</span></p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-gray-800/50 p-4 rounded-2xl border border-gray-700 text-center">
+                        <i class="fas fa-eye text-indigo-400 text-2xl mb-2"></i>
+                        <p class="text-xs text-gray-300">Look at Camera</p>
+                    </div>
+                    <div class="bg-gray-800/50 p-4 rounded-2xl border border-gray-700 text-center">
+                        <i class="fas fa-smile text-yellow-400 text-2xl mb-2"></i>
+                        <p class="text-xs text-gray-300">Smile to Verify</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. FIREBASE CONFIG ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyDA7C0M5vtizBMXpVtvz9-b7BRGsxIgr0c",
+            authDomain: "smartattendance-64d2a.firebaseapp.com",
+            projectId: "smartattendance-64d2a",
+            storageBucket: "smartattendance-64d2a.firebasestorage.app",
+            messagingSenderId: "137522939302",
+            appId: "1:137522939302:web:8b227e0f86ca6796a3bb67",
+            measurementId: "G-K0HFCVG872"
+        };
+        firebase.initializeApp(firebaseConfig);
+
+        const loginBtn = document.getElementById('loginBtn');
+        const userProfile = document.getElementById('userProfile');
+        const userPhoto = document.getElementById('userPhoto');
+
+        // Check Login State
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                loginBtn.classList.add('hidden');
+                userProfile.classList.remove('hidden');
+                userPhoto.src = user.photoURL; 
+            } else {
+                loginBtn.classList.remove('hidden');
+                userProfile.classList.add('hidden');
+            }
+        });
+
+        function googleLogin() {
+            const provider = new firebase.auth.GoogleAuthProvider();
+            firebase.auth().signInWithPopup(provider)
+                .then((result) => { console.log("Logged in:", result.user.displayName); })
+                .catch((error) => { alert("Login Error: " + error.message); console.error(error); });
+        }
+
+        // --- 2. MEDIAPIPE LOGIC ---
+        const videoElement = document.getElementById('video');
+        const canvasElement = document.getElementById('output_canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        const statusText = document.getElementById('statusText');
+        const userName = document.getElementById('userName');
+        const userIcon = document.getElementById('userIcon');
+        let blurEnabled = true;
+
+        const selfieSegmentation = new SelfieSegmentation({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`});
+        selfieSegmentation.setOptions({ modelSelection: 1 });
+
+        selfieSegmentation.onResults((results) => {
+            // FIX: Set canvas size dynamically to match video stream (Prevents Squishing)
+            canvasElement.width = videoElement.videoWidth;
+            canvasElement.height = videoElement.videoHeight;
+
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+            // 1. Draw Segmentation Mask
+            canvasCtx.drawImage(results.segmentationMask, 0, 0, canvasElement.width, canvasElement.height);
+
+            // 2. Logic to keep PERSON clear and BACKGROUND blurred
+            canvasCtx.globalCompositeOperation = 'source-in'; // Only draw where mask is (The Person)
+            canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height); // Draw Clear Person
+
+            // 3. Draw Background behind Person
+            canvasCtx.globalCompositeOperation = 'destination-over'; // Draw behind existing pixels
+            if (blurEnabled) {
+                canvasCtx.filter = 'blur(15px)'; // Blur amount
+                canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+                canvasCtx.filter = 'none';
+            } else {
+                canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+            }
+
+            canvasCtx.restore();
+        });
+
+        const camera = new Camera(videoElement, {
+            onFrame: async () => { await selfieSegmentation.send({image: videoElement}); },
+            width: 1280, height: 720 // Request HD resolution
+        });
+        camera.start();
+
+        function toggleBlur() {
+            blurEnabled = !blurEnabled;
+            document.getElementById('blurStatus').innerText = blurEnabled ? "ON" : "OFF";
+            document.getElementById('blurStatus').className = blurEnabled ? "font-bold text-green-400" : "font-bold text-red-400";
+        }
+
+        // --- 3. SEND TO PYTHON ---
+        setInterval(() => {
+            // Send smaller image for speed (0.5 quality)
+            const imageData = canvasElement.toDataURL('image/jpeg', 0.5);
+            fetch('/process_frame', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: imageData })
+            })
+            .then(res => res.json())
+            .then(data => {
+                userName.innerText = data.name;
+                statusText.innerText = data.status;
+
+                // Update UI Colors based on Status
+                if (data.color === "green") {
+                    statusText.className = "text-4xl md:text-5xl font-extrabold text-green-400";
+                    userIcon.className = "fas fa-user-check text-3xl text-green-400";
+                } else if (data.color === "yellow") {
+                    statusText.className = "text-4xl md:text-5xl font-extrabold text-yellow-400";
+                    userIcon.className = "fas fa-user text-3xl text-yellow-400";
+                } else if (data.color === "red") {
+                    statusText.className = "text-4xl md:text-5xl font-extrabold text-red-400";
+                    userIcon.className = "fas fa-user-slash text-3xl text-red-400";
+                } else {
+                    statusText.className = "text-4xl md:text-5xl font-extrabold text-white";
+                    userIcon.className = "fas fa-user text-3xl text-gray-400";
+                }
+            })
+            .catch(err => console.log("Processing..."));
+        }, 800);
+    </script>
+</body>
+</html>

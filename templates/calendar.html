@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>My Attendance</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .glass { background: rgba(31, 41, 55, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        body { background: radial-gradient(circle at top, #1e1b4b 0%, #000000 100%); }
+    </style>
+</head>
+<body class="text-white min-h-screen p-6 flex flex-col items-center">
+
+    <div class="w-full max-w-4xl space-y-8">
+        
+        <div class="flex justify-between items-center">
+            <h1 class="text-3xl font-bold flex items-center gap-2">
+                <i class="fas fa-calendar-check text-indigo-500"></i> My Profile
+            </h1>
+            <a href="/" class="text-gray-400 hover:text-white text-sm"><i class="fas fa-arrow-left mr-2"></i> Back to Scanner</a>
+        </div>
+
+        <div class="glass p-8 rounded-2xl text-center" id="searchContainer">
+            <h2 class="text-xl font-bold mb-4">View Your Records</h2>
+            <p class="text-gray-400 text-sm mb-6">Please enter your Student/Employee ID to fetch your specific records.</p>
+            
+            <div class="flex gap-4 max-w-md mx-auto">
+                <input type="number" id="searchId" placeholder="ID Number (e.g. 101)" 
+                       class="bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-3 w-full focus:outline-none focus:border-indigo-500">
+                <button onclick="fetchData()" class="bg-indigo-600 hover:bg-indigo-700 px-6 py-3 rounded-lg font-bold shadow-lg transition">
+                    Fetch
+                </button>
+            </div>
+        </div>
+
+        <div id="reportCard" class="hidden space-y-6 animate-fade-in-up">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="glass p-6 rounded-2xl flex items-center justify-between">
+                    <div>
+                        <p class="text-xs text-gray-400 uppercase font-bold">Days Present</p>
+                        <h2 class="text-4xl font-extrabold text-white mt-1"><span id="daysCount">0</span></h2>
+                    </div>
+                    <i class="fas fa-check-circle text-4xl text-green-500 opacity-50"></i>
+                </div>
+                <div class="glass p-6 rounded-2xl">
+                    <p class="text-xs text-gray-400 uppercase font-bold">Monthly Score</p>
+                    <div class="flex items-center gap-4 mt-2">
+                        <h2 class="text-4xl font-extrabold text-indigo-400" id="percentText">0%</h2>
+                        <div class="w-full bg-gray-700 rounded-full h-2 overflow-hidden">
+                            <div id="progressBar" class="bg-indigo-500 h-2 rounded-full transition-all duration-1000" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass p-8 rounded-3xl">
+                <h3 class="font-bold text-xl mb-6 border-b border-gray-700 pb-4">Activity Log</h3>
+                <div class="grid grid-cols-7 gap-2 md:gap-4" id="calendarGrid">
+                    </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function fetchData() {
+            const uid = document.getElementById('searchId').value;
+            if(!uid) return alert("Please enter your ID");
+
+            fetch('/get_attendance_data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: uid })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.error) return alert("No records found for ID: " + uid);
+
+                // Hide Search, Show Report (Optional: Keep search to switch IDs)
+                document.getElementById('reportCard').classList.remove('hidden');
+                
+                // Update Stats
+                document.getElementById('daysCount').innerText = data.days_present;
+                document.getElementById('percentText').innerText = data.percentage + "%";
+                document.getElementById('progressBar').style.width = data.percentage + "%";
+
+                // Generate Calendar
+                const grid = document.getElementById('calendarGrid');
+                grid.innerHTML = ""; 
+
+                const now = new Date();
+                const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+                const currentMonthStr = now.toISOString().slice(0, 7); 
+
+                for (let i = 1; i <= daysInMonth; i++) {
+                    const dayBox = document.createElement('div');
+                    const dayStr = i < 10 ? "0" + i : i;
+                    const fullDate = `${currentMonthStr}-${dayStr}`;
+
+                    dayBox.className = "aspect-square rounded-lg flex items-center justify-center font-bold text-sm transition";
+                    dayBox.innerText = i;
+
+                    if (data.dates.includes(fullDate)) {
+                        dayBox.classList.add("bg-green-600", "text-white", "shadow-lg", "shadow-green-900/50");
+                    } else {
+                        dayBox.classList.add("bg-gray-800", "text-gray-600");
+                    }
+                    grid.appendChild(dayBox);
+                }
+            });
+        }
+    </script>
+</body>
+</html>

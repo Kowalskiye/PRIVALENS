@@ -1,0 +1,6 @@
+flask
+gunicorn
+numpy
+opencv-contrib-python-headless
+mediapipe
+firebase-admin
