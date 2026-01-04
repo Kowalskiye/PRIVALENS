@@ -2,5 +2,6 @@ flask
 gunicorn
 numpy
 opencv-contrib-python-headless
-mediapipe
+mediapipe==0.10.9
 firebase-admin
+protobuf==3.20.3
