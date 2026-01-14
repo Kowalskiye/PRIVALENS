@@ -67,11 +67,13 @@ PRIVALENS/
 ├── serviceAccountKey.json  # Firebase Admin Keys (Sensitive - Do not commit)
 └── .gitignore              # Git exclusion rules
 
+'''bash
+
 🚀 Getting Started
 Follow these instructions to set up the project on your local machine.
 
 1. Clone the Repository
-Bash
+'''bash
 
 git clone [https://github.com/Kowalskiye/PRIVALENS.git](https://github.com/Kowalskiye/PRIVALENS.git)
 cd PRIVALENS
@@ -101,7 +103,6 @@ Ensure you have a valid Google AI Studio API Key.
 Configure it in your environment variables (or .env file if configured).
 
 4. Run the Application
-Bash
 
 python app.py
 The server will start at http://127.0.0.1:5000/.
