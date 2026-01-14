@@ -66,3 +66,44 @@ PRIVALENS/
 ├── runtime.txt             # Python version specification
 ├── serviceAccountKey.json  # Firebase Admin Keys (Sensitive - Do not commit)
 └── .gitignore              # Git exclusion rules
+
+🚀 Getting Started
+Follow these instructions to set up the project on your local machine.
+
+1. Clone the Repository
+Bash
+
+git clone [https://github.com/Kowalskiye/PRIVALENS.git](https://github.com/Kowalskiye/PRIVALENS.git)
+cd PRIVALENS
+2. Install Dependencies
+Ensure you have Python installed, then run:
+
+Bash
+
+pip install -r requirements.txt
+3. Configuration (Critical)
+This project requires sensitive API keys to function.
+
+Firebase Setup:
+
+Go to Firebase Console.
+
+Navigate to Project Settings -> Service Accounts.
+
+Generate a new Private Key.
+
+Rename the downloaded file to serviceAccountKey.json and place it in the root folder.
+
+Gemini AI Setup:
+
+Ensure you have a valid Google AI Studio API Key.
+
+Configure it in your environment variables (or .env file if configured).
+
+4. Run the Application
+Bash
+
+python app.py
+The server will start at http://127.0.0.1:5000/.
+
+Note: Allow camera permissions in your browser when prompted.
