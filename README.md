@@ -20,6 +20,20 @@
 
 ---
 
+## 🎯 Problem Statement & Impact
+
+### **Problems Solved**
+* **🚫 The "Proxy" Problem:** Standard attendance systems are easy to fool with static photos. Privalens uses **Liveness Detection (Blink & Smile)** to ensure physical presence, making "buddy punching" impossible.
+* **📶 The "No Signal" Barrier:** Most biometric apps crash without internet. Our **Offline-First Architecture** ensures 100% functionality in rural areas or basements, bridging the digital divide.
+* **🕵️ The "Ghost Data" Issue:** Raw logs are hard to analyze. We use **Gemini AI** to transform data into actionable insights (e.g., *"Student X is late every Monday"*), enabling proactive intervention.
+
+### **Contribution to Society**
+* **🎓 Educational Integrity:** Guarantees accurate records for schools, helping identify disengaged students early.
+* **🌍 Digital Inclusion:** Runs on low-end hardware (via TensorFlow Lite) and works offline, bringing high-tech security to under-funded or remote institutions.
+* **🛡️ Privacy:** Processes facial features on the **Edge** (on-device) rather than streaming video to the cloud, respecting user privacy.
+
+---
+
 ## 💻 Tech Stack
 
 ### **Backend**
