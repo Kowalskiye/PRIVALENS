@@ -78,7 +78,7 @@ cd PRIVALENS
 2. Install Dependencies
 Ensure you have Python installed, then run:
 
-Bash
+'''bash
 
 pip install -r requirements.txt
 3. Configuration (Critical)
