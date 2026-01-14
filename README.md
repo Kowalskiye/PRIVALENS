@@ -6,12 +6,12 @@
 ![MediaPipe](https://img.shields.io/badge/MediaPipe-Vision-orange?style=for-the-badge)
 ![Heroku](https://img.shields.io/badge/Heroku-Deployment-430098?style=for-the-badge&logo=heroku&logoColor=white)
 
-## 📖 Overview
+##  Overview
 **Privalens** is a fraud-proof, privacy-focused facial attendance system designed for unstable network environments. It solves the problem of "proxy" attendance and internet dependency by combining **Edge AI** for instant liveness detection with a **Hybrid Sync Engine**. The system ensures 100% uptime by logging data locally and syncing to the cloud only when connectivity is available, while **Google Gemini** provides intelligent analytics on the backend.
 
 ---
 
-## ✨ Features
+##  Features
 * **Zero-Latency Liveness Check:** Instant verification of "Blink" and "Smile" gestures using **Google MediaPipe** (works in <50ms).
 * **Offline-First Architecture:** Automatically switches between Local Storage and Cloud Database based on network availability.
 * **Smart Sync Engine:** Queues attendance logs offline and pushes them to **Firebase** the moment Wi-Fi is restored.
@@ -20,21 +20,21 @@
 
 ---
 
-## 🎯 Problem Statement & Impact
+##  Problem Statement & Impact
 
 ### **Problems Solved**
-* **🚫 The "Proxy" Problem:** Standard attendance systems are easy to fool with static photos. Privalens uses **Liveness Detection (Blink & Smile)** to ensure physical presence, making "buddy punching" impossible.
-* **📶 The "No Signal" Barrier:** Most biometric apps crash without internet. Our **Offline-First Architecture** ensures 100% functionality in rural areas or basements, bridging the digital divide.
-* **🕵️ The "Ghost Data" Issue:** Raw logs are hard to analyze. We use **Gemini AI** to transform data into actionable insights (e.g., *"Student X is late every Monday"*), enabling proactive intervention.
+* ** The "Proxy" Problem:** Standard attendance systems are easy to fool with static photos. Privalens uses **Liveness Detection (Blink & Smile)** to ensure physical presence, making "buddy punching" impossible.
+* ** The "No Signal" Barrier:** Most biometric apps crash without internet. Our **Offline-First Architecture** ensures 100% functionality in rural areas or basements, bridging the digital divide.
+* ** The "Ghost Data" Issue:** Raw logs are hard to analyze. We use **Gemini AI** to transform data into actionable insights (e.g., *"Student X is late every Monday"*), enabling proactive intervention.
 
 ### **Contribution to Society**
-* **🎓 Educational Integrity:** Guarantees accurate records for schools, helping identify disengaged students early.
-* **🌍 Digital Inclusion:** Runs on low-end hardware (via TensorFlow Lite) and works offline, bringing high-tech security to under-funded or remote institutions.
-* **🛡️ Privacy:** Processes facial features on the **Edge** (on-device) rather than streaming video to the cloud, respecting user privacy.
+* ** Educational Integrity:** Guarantees accurate records for schools, helping identify disengaged students early.
+* ** Digital Inclusion:** Runs on low-end hardware (via TensorFlow Lite) and works offline, bringing high-tech security to under-funded or remote institutions.
+* ** Privacy:** Processes facial features on the **Edge** (on-device) rather than streaming video to the cloud, respecting user privacy.
 
 ---
 
-## 💻 Tech Stack
+
 
 ## 💻 Tech Stack
 
