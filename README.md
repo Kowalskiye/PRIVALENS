@@ -120,3 +120,34 @@ python app.py
 -The server will start at http://127.0.0.1:5000/.
 
 --Note: Allow camera permissions in your browser when prompted.
+
+## 🧭 Navigation Guide
+
+Once the application is running, here is how to use the different features:
+
+### 1. Register a New User
+* **Navigate to:** `http://127.0.0.1:5000/register` (or click "Register" on the home page).
+* **Action:**
+    1.  Enter the user's **Name** and **ID**.
+    2.  The camera will activate. Align your face within the frame.
+    3.  Click **"Capture & Save"**.
+* **Result:** The system extracts your face embeddings and saves them to the local secure database.
+
+### 2. Verify Attendance (Liveness Check)
+* **Navigate to:** `http://127.0.0.1:5000/` (Home Page).
+* **Action:**
+    1.  Look at the camera.
+    2.  **Liveness Challenge:** The system will ask you to **"Blink"** or **"Smile"** to prove you are human.
+    3.  Once the gesture is detected, the system matches your face against the database.
+* **Result:** You will see a green **"VERIFIED"** badge and your attendance is marked.
+
+### 3. View Analytics (Admin Dashboard)
+* **Navigate to:** `http://127.0.0.1:5000/dashboard`.
+* **Features:**
+    * **Real-time Stats:** See total present/absent counts.
+    * **Gemini Insights:** Click the **"Generate AI Report"** button to see a natural language summary of attendance trends (e.g., "Most punctual students").
+
+### 4. Check History (Calendar)
+* **Navigate to:** `http://127.0.0.1:5000/calendar` (or via the Dashboard sidebar).
+* **Action:** Select a specific date or user to view detailed logs.
+* **Result:** Displays a visual calendar marking "Present" (Green) or "Absent" (Red) days.
