@@ -94,7 +94,7 @@ cd PRIVALENS
 ```bash
 pip install -r requirements.txt
 ```
-##3. Configuration (Critical)
+## 3. Configuration (Critical)
 This project requires sensitive API keys to function.
 
 ### **Firebase Setup:**
