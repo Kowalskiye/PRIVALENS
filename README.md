@@ -39,28 +39,28 @@
 ## 💻 Tech Stack
 
 ### **Backend**
+![Python](https://img.shields.io/badge/Python-3.9%2B-blue?style=for-the-badge&logo=python&logoColor=white)
+ ![MediaPipe](https://img.shields.io/badge/MediaPipe-Vision-orange?style=for-the-badge)
+ ![Google Gemini](https://img.shields.io/badge/Google%20Gemini-8E75B2?style=for-the-badge&logo=googlebard&logoColor=white)
+ ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
 * **Language:** Python 3.9+ 
-  ![Python](https://img.shields.io/badge/Python-3.9%2B-blue?style=for-the-badge&logo=python&logoColor=white)
 * **Framework:** Flask (Micro-framework)
 * **Computer Vision:** Google MediaPipe & OpenCV 
-  ![MediaPipe](https://img.shields.io/badge/MediaPipe-Vision-orange?style=for-the-badge)
 * **AI/LLM:** Google Gemini Pro API 
-  ![Google Gemini](https://img.shields.io/badge/Google%20Gemini-8E75B2?style=for-the-badge&logo=googlebard&logoColor=white)
 * **Database (Cloud):** Google Firebase Firestore 
-  ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
 * **Database (Local):** JSON / Local File Storage (Encrypted)
 
 ### **Frontend**
-* **Core:** HTML5, CSS3, JavaScript
-  ![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)
+![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)
   ![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)
   ![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
+* **Core:** HTML5, CSS3, JavaScript
 * **Templating:** Jinja2 (Flask default)
 * **Styling:** Custom Responsive CSS
 
 ### **Tooling & Deployment**
+ ![Heroku](https://img.shields.io/badge/Heroku-Deployment-430098?style=for-the-badge&logo=heroku&logoColor=white)
 * **Deployment:** Heroku 
-  ![Heroku](https://img.shields.io/badge/Heroku-Deployment-430098?style=for-the-badge&logo=heroku&logoColor=white)
 * **IDE:** VS Code
 * **Version Control:** Git & GitHub
 * **Development:** Google Colab (Model Training)
