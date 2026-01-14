@@ -1,4 +1,3 @@
-# PRIVALENS
 # 👁️ PRIVALENS: Intelligent Offline-First Attendance System
 
 ![Python](https://img.shields.io/badge/Python-3.9%2B-blue?style=for-the-badge&logo=python&logoColor=white)
@@ -66,23 +65,21 @@ PRIVALENS/
 ├── runtime.txt             # Python version specification
 ├── serviceAccountKey.json  # Firebase Admin Keys (Sensitive - Do not commit)
 └── .gitignore              # Git exclusion rules
-
-'''bash
-
+```
 🚀 Getting Started
 Follow these instructions to set up the project on your local machine.
 
 1. Clone the Repository
-'''bash
-
+```bash
 git clone [https://github.com/Kowalskiye/PRIVALENS.git](https://github.com/Kowalskiye/PRIVALENS.git)
 cd PRIVALENS
+```
+
 2. Install Dependencies
 Ensure you have Python installed, then run:
-
-'''bash
-
+```bash
 pip install -r requirements.txt
+```
 3. Configuration (Critical)
 This project requires sensitive API keys to function.
 
@@ -103,8 +100,9 @@ Ensure you have a valid Google AI Studio API Key.
 Configure it in your environment variables (or .env file if configured).
 
 4. Run the Application
-
+```bash
 python app.py
+```
 The server will start at http://127.0.0.1:5000/.
 
 Note: Allow camera permissions in your browser when prompted.
