@@ -80,10 +80,10 @@ PRIVALENS/
 ├── serviceAccountKey.json  # Firebase Admin Keys (Sensitive - Do not commit)
 └── .gitignore              # Git exclusion rules
 ```
-##🚀 Getting Started
+### 🚀 Getting Started
 Follow these instructions to set up the project on your local machine.
 
-1. Clone the Repository
+## 1. Clone the Repository
 ```bash
 git clone [https://github.com/Kowalskiye/PRIVALENS.git](https://github.com/Kowalskiye/PRIVALENS.git)
 cd PRIVALENS
@@ -97,7 +97,7 @@ pip install -r requirements.txt
 ##3. Configuration (Critical)
 This project requires sensitive API keys to function.
 
-## **Firebase Setup:**
+### **Firebase Setup:**
 
 Go to Firebase Console.
 
@@ -107,7 +107,7 @@ Generate a new Private Key.
 
 Rename the downloaded file to serviceAccountKey.json and place it in the root folder.
 
-## **Gemini AI Setup:**
+### **Gemini AI Setup:**
 
 Ensure you have a valid Google AI Studio API Key.
 
