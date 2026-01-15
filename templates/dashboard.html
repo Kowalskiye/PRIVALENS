@@ -42,6 +42,21 @@
             height: 100%;
             object-fit: cover; 
         }
+
+        /* --- POPUP STYLES --- */
+        .glass-modal {
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 50px rgba(79, 70, 229, 0.3);
+        }
+        @keyframes popUp {
+            0% { opacity: 0; transform: scale(0.9) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .animate-popup {
+            animation: popUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
     </style>
 </head>
 <body class="text-white min-h-screen flex flex-col font-sans">
@@ -131,8 +146,71 @@
         </div>
     </div>
 
+    <div id="welcomeModal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm hidden">
+        <div class="glass-modal p-8 rounded-3xl max-w-lg w-full mx-4 text-center relative animate-popup">
+            
+            <div class="absolute -top-10 -left-10 w-40 h-40 bg-indigo-600 rounded-full blur-[100px] opacity-30"></div>
+            <div class="absolute -bottom-10 -right-10 w-40 h-40 bg-purple-600 rounded-full blur-[100px] opacity-30"></div>
+
+            <div class="relative mb-6">
+                <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center mx-auto shadow-2xl shadow-indigo-500/40">
+                    <i class="fas fa-robot text-4xl text-white"></i>
+                </div>
+            </div>
+
+            <h2 class="text-3xl font-bold text-white mb-2 tracking-tight">System Ready</h2>
+            <p class="text-gray-400 text-sm mb-8">Welcome to Privalens. Follow the protocol below.</p>
+
+            <div class="space-y-3 text-left mb-8 relative z-10">
+                <div class="flex items-center gap-4 bg-gray-800/40 p-4 rounded-xl border border-white/5 hover:bg-gray-800/60 transition group">
+                    <div class="w-10 h-10 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold border border-indigo-500/30 group-hover:scale-110 transition">1</div>
+                    <div>
+                        <h4 class="text-white font-bold text-sm">Register Face</h4>
+                        <p class="text-gray-500 text-xs">Create your biometric ID first.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 bg-gray-800/40 p-4 rounded-xl border border-white/5 hover:bg-gray-800/60 transition group">
+                    <div class="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold border border-emerald-500/30 group-hover:scale-110 transition">2</div>
+                    <div>
+                        <h4 class="text-white font-bold text-sm">Mark Attendance</h4>
+                        <p class="text-gray-500 text-xs">Look at camera: <b>Blink</b> then <b>Smile</b>.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-4 bg-gray-800/40 p-4 rounded-xl border border-white/5 hover:bg-gray-800/60 transition group">
+                    <div class="w-10 h-10 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center font-bold border border-blue-500/30 group-hover:scale-110 transition">3</div>
+                    <div>
+                        <h4 class="text-white font-bold text-sm">Check Records</h4>
+                        <p class="text-gray-500 text-xs">Log in with Google to check attendance.</p>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="closeWelcomeModal()" class="relative w-full group overflow-hidden bg-white text-gray-900 font-bold py-4 rounded-xl shadow-lg transition transform hover:scale-[1.02]">
+                <span class="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500 to-purple-600 opacity-0 group-hover:opacity-100 transition duration-300"></span>
+                <span class="relative group-hover:text-white transition duration-200 flex items-center justify-center gap-2">
+                    Initialize System <i class="fas fa-arrow-right"></i>
+                </span>
+            </button>
+        </div>
+    </div>
+
     <script>
-        // --- 1. FIREBASE CONFIG ---
+        // --- POPUP LOGIC ---
+        document.addEventListener("DOMContentLoaded", () => {
+            const seen = localStorage.getItem("privalens_intro_seen");
+            if (!seen) {
+                document.getElementById("welcomeModal").classList.remove("hidden");
+            }
+        });
+
+        function closeWelcomeModal() {
+            document.getElementById("welcomeModal").classList.add("hidden");
+            localStorage.setItem("privalens_intro_seen", "true");
+        }
+
+        // --- FIREBASE CONFIG ---
         const firebaseConfig = {
             apiKey: "AIzaSyDA7C0M5vtizBMXpVtvz9-b7BRGsxIgr0c",
             authDomain: "smartattendance-64d2a.firebaseapp.com",
@@ -167,33 +245,26 @@
         }
 
         function googleLogout() {
-            firebase.auth().signOut().then(() => {
-                window.location.href = '/'; 
-            });
+            firebase.auth().signOut().then(() => { window.location.href = '/'; });
         }
 
-        // --- 2. SOUND GENERATOR (No Files Needed) ---
+        // --- SOUND GENERATOR ---
         function playBeep() {
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioCtx.createOscillator();
             const gainNode = audioCtx.createGain();
-            
             oscillator.connect(gainNode);
             gainNode.connect(audioCtx.destination);
-            
-            // "Success" sound settings
             oscillator.type = 'sine';
-            oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
-            oscillator.frequency.exponentialRampToValueAtTime(1046.5, audioCtx.currentTime + 0.1); // High C6
-            
+            oscillator.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+            oscillator.frequency.exponentialRampToValueAtTime(1046.5, audioCtx.currentTime + 0.1);
             gainNode.gain.setValueAtTime(0.3, audioCtx.currentTime);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-            
             oscillator.start();
             oscillator.stop(audioCtx.currentTime + 0.5);
         }
 
-        // --- 3. MEDIAPIPE LOGIC ---
+        // --- MEDIAPIPE LOGIC ---
         const videoElement = document.getElementById('video');
         const canvasElement = document.getElementById('output_canvas');
         const canvasCtx = canvasElement.getContext('2d');
@@ -203,8 +274,12 @@
         const userIcon = document.getElementById('userIcon');
         let blurEnabled = true;
         
-        // Track state to prevent infinite beeping
-        let isVerifiedState = false;
+        // --- 4-SECOND HOLD VARIABLES ---
+        let verificationExpiry = 0; // Timestamp when verification hold ends
+        let cachedName = "--";
+        let cachedId = "--";
+        let cachedStatus = "";
+        let isVerifiedState = false; // Used for sound to prevent repeating
 
         const selfieSegmentation = new SelfieSegmentation({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation/${file}`});
         selfieSegmentation.setOptions({ modelSelection: 1 });
@@ -240,7 +315,7 @@
             document.getElementById('blurStatus').className = blurEnabled ? "font-bold text-green-400" : "font-bold text-red-400";
         }
 
-        // --- 4. SEND TO PYTHON & HANDLE SOUND ---
+        // --- PROCESSING LOOP ---
         setInterval(() => {
             const imageData = canvasElement.toDataURL('image/jpeg', 0.5);
             fetch('/process_frame', {
@@ -250,28 +325,51 @@
             })
             .then(res => res.json())
             .then(data => {
-                userName.innerText = data.name;
-                userId.innerText = data.id;
-                statusText.innerText = data.status;
+                
+                // --- MODIFIED LOGIC START: 4-SECOND HOLD ---
+                let finalColor = data.color;
+                let finalName = data.name;
+                let finalId = data.id;
+                let finalStatus = data.status;
+                const now = Date.now();
 
-                // --- SOUND LOGIC ---
+                // 1. If backend says Green (Verified), set/reset the 4-second timer
                 if (data.color === "green") {
-                    // Only beep if we weren't verified in the last check
+                    verificationExpiry = now + 4000; // Hold for 4000ms (4s)
+                    cachedName = data.name;
+                    cachedId = data.id;
+                    cachedStatus = data.status;
+                }
+                // 2. If NOT green, but timer is still valid, force it to be Green
+                else if (now < verificationExpiry) {
+                    finalColor = "green";
+                    finalName = cachedName;
+                    finalId = cachedId;
+                    finalStatus = cachedStatus;
+                }
+
+                // Update UI with the final decided values
+                userName.innerText = finalName;
+                userId.innerText = finalId;
+                statusText.innerText = finalStatus;
+
+                // --- UI & SOUND LOGIC ---
+                if (finalColor === "green") {
+                    // Play sound only if we are transitioning into Verified state
                     if (!isVerifiedState) {
                         playBeep();
                         isVerifiedState = true;
                     }
-                    
                     statusText.className = "text-4xl md:text-5xl font-extrabold text-green-400";
                     userIcon.className = "fas fa-user-check text-3xl text-green-400";
                     
-                } else if (data.color === "yellow") {
-                    isVerifiedState = false; // Reset state so we can beep again next time
+                } else if (finalColor === "yellow") {
+                    isVerifiedState = false; 
                     statusText.className = "text-4xl md:text-5xl font-extrabold text-yellow-400";
                     userIcon.className = "fas fa-user text-3xl text-yellow-400";
                     
-                } else if (data.color === "red") {
-                    isVerifiedState = false; // Reset state
+                } else if (finalColor === "red") {
+                    isVerifiedState = false; 
                     statusText.className = "text-4xl md:text-5xl font-extrabold text-red-400";
                     userIcon.className = "fas fa-user-slash text-3xl text-red-400";
                     
