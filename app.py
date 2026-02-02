@@ -15,9 +15,9 @@ from firebase_admin import credentials, firestore
 
 app = Flask(__name__)
 
-# --- 1. CONFIGURATION ---remove spaces between the dots in token 
-DISCORD_TOKEN = "MTQ1NzY2MjUzMzYwNjQ0NTE0NQ . GBVSbj . U1B7LL3Hg0034FxhqWNLSoLaGB3u1cegnPNuYQ"
-CHANNEL_ID = "1457670836193464434"
+# --- 1. CONFIGURATION ---
+DISCORD_TOKEN = "add your app token here"
+CHANNEL_ID = "enter your channel id"
 FIREBASE_KEY = os.environ.get("FIREBASE_KEY_JSON") 
 
 # --- 2. FIREBASE INIT ---
@@ -301,5 +301,6 @@ if __name__ == '__main__':
     port = int(os.environ.get("PORT", 7860))
     print(f"🚀 Web Server Starting on Port {port}...")
     app.run(host='0.0.0.0', port=port)
+
 
 
